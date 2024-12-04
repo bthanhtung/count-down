@@ -10,14 +10,14 @@ window.onload = function(){
         cd_timetil: document.getElementById("cd-timetil")
     };
 
-    elements.cd_title.innerHTML += " " + ((new Date()).getFullYear()+1);
+    elements.cd_title.innerHTML += " " + ((new Date()).getFullYear() + 1);
 
     // Current year + 1, Jan, 1st
     var endDate = new Date((new Date()).getFullYear() + 1 + "/1/1"),
         _sec = 1000,
-        _min = _sec*60,
-        _hour = _min*60,
-        _day = _hour*24;
+        _min = _sec * 60,
+        _hour = _min * 60,
+        _day = _hour * 24;
 
     elements.cd_timetil.innerHTML = "Time until " + endDate.toDateString();
 
@@ -29,11 +29,13 @@ window.onload = function(){
             elements.cd_title.innerHTML = "Happy New Year!";
             return clearInterval(cdInterval);
         }
-        var days = Math.floor(dif/_day),
-            hours = Math.floor(dif%_day/_hour),
-            mins = Math.floor(dif%_hour/_min);
-            secs = Math.floor(dif%_min/_sec);
-        elements.cd_days.innerHTML = ("000" + days).slice(-3);
+        var days = Math.floor(dif / _day),
+            hours = Math.floor(dif % _day / _hour),
+            mins = Math.floor(dif % _hour / _min),
+            secs = Math.floor(dif % _min / _sec);
+        
+        // Adjust cd_days to show 3 characters if >= 100
+        elements.cd_days.innerHTML = days >= 100 ? days : ("00" + days).slice(-2);
         elements.cd_days.nextElementSibling.innerHTML = "Day" + (days == 1 ? "" : "s");
         elements.cd_hours.innerHTML = ("00" + hours).slice(-2);
         elements.cd_hours.nextElementSibling.innerHTML = "Hour" + (hours == 1 ? "" : "s");
