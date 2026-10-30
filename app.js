@@ -97,11 +97,55 @@ function setMode(m) {
 sw.addEventListener('click', e => { const b = e.target.closest('button'); if (b) setMode(b.dataset.mode); });
 
 function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('show'), 1800); }
-$('#share-btn').onclick = async () => {
-  const T = target(Date.now()), text = T.celebrating ? `Chúc mừng năm mới! ${WISHES[wi % WISHES.length]} 🧧` : `Còn ${$('[data-u=d]').textContent} ngày nữa là ${T.name} 🧧`;
-  if (navigator.share) { try { await navigator.share({ text, url: location.href }); } catch {} return; }
-  try { await navigator.clipboard.writeText(`${text} ${location.href}`); toast('Đã chép lời nhắn, dán gửi bạn bè nhé'); } catch { toast(location.href); }
+// ---------- chia sẻ: Facebook, Messenger, Zalo, Telegram, X, chép link ----------
+const SITE = 'https://saptet.tungdadev.com/';
+const mobile = matchMedia('(pointer: coarse)').matches;
+function shareInfo() {
+  const T = target(Date.now());
+  const url = SITE + (mode === 'duong' ? '?mode=duong' : '');
+  const text = T.celebrating ? `Chúc mừng năm mới! ${WISHES[wi % WISHES.length]} 🧧` : `Còn ${parseInt($('[data-u=d]').textContent, 10)} ngày nữa là ${T.name} 🧧`;
+  return { url, text };
+}
+async function copyLink(msg) {
+  const { url, text } = shareInfo();
+  try { await navigator.clipboard.writeText(`${text}\n${url}`); toast(msg || 'Đã chép link, dán gửi bạn bè nhé'); return true; }
+  catch { toast(url); return false; }
+}
+const enc = encodeURIComponent;
+const ACTIONS = {
+  facebook: () => { const { url } = shareInfo(); popup(`https://www.facebook.com/sharer/sharer.php?u=${enc(url)}`); },
+  messenger: async () => {
+    const { url } = shareInfo();
+    if (mobile) { location.href = `fb-messenger://share/?link=${enc(url)}`; return; }
+    await copyLink('Đã chép link, dán vào Messenger nhé'); window.open('https://www.messenger.com/', '_blank', 'noopener');
+  },
+  zalo: async () => {
+    // Zalo không có link chia sẻ công khai: điện thoại dùng bảng chia sẻ của máy (có Zalo), máy tính chép link rồi mở Zalo Web
+    if (mobile && navigator.share) { const { url, text } = shareInfo(); try { await navigator.share({ text, url }); } catch {} return; }
+    await copyLink('Đã chép link, dán vào Zalo nhé'); window.open('https://chat.zalo.me/', '_blank', 'noopener');
+  },
+  telegram: () => { const { url, text } = shareInfo(); popup(`https://t.me/share/url?url=${enc(url)}&text=${enc(text)}`); },
+  x: () => { const { url, text } = shareInfo(); popup(`https://x.com/intent/post?text=${enc(text)}&url=${enc(url)}`); },
+  copy: () => copyLink(),
+  more: async () => { const { url, text } = shareInfo(); try { await navigator.share({ text, url }); } catch {} },
 };
+function popup(u) { window.open(u, '_blank', 'noopener,width=620,height=640'); }
+const sheet = $('#share-sheet');
+if (!navigator.share) sheet.querySelector('[data-share=more]').remove();
+function openSheet(open) {
+  document.body.classList.toggle('sheet-open', open);
+  sheet.setAttribute('aria-hidden', !open);
+  if (open) { $('#share-preview').textContent = shareInfo().text; sheet.querySelector('button[data-share]').focus(); }
+}
+$('#share-btn').onclick = () => openSheet(true);
+$('#sheet-scrim').onclick = () => openSheet(false);
+$('#sheet-close').onclick = () => openSheet(false);
+addEventListener('keydown', e => { if (e.key === 'Escape') openSheet(false); });
+sheet.addEventListener('click', e => {
+  const b = e.target.closest('[data-share]'); if (!b) return;
+  ACTIONS[b.dataset.share]();
+  if (b.dataset.share !== 'copy') openSheet(false);
+});
 
 // ---------- hoa mai rơi ----------
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;

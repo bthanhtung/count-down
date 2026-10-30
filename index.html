@@ -6,8 +6,15 @@
   <title>Đếm ngược Tết</title>
   <meta name="description" content="Đếm ngược đến Tết Nguyên Đán và Tết Dương lịch theo giờ Việt Nam. Hoa mai rơi, pháo hoa và lời chúc đầu năm.">
   <meta name="theme-color" content="#2a0508">
-  <meta property="og:title" content="Đếm ngược Tết">
-  <meta property="og:description" content="Còn bao lâu nữa là Tết? Đếm từng giây theo giờ Việt Nam.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://saptet.tungdadev.com/">
+  <meta property="og:title" content="Sắp Tết rồi! Còn bao nhiêu ngày nữa?">
+  <meta property="og:description" content="Đếm ngược từng giây đến Tết Đinh Mùi 2027 theo giờ Việt Nam — hoa mai rơi, pháo hoa và lời chúc đầu năm.">
+  <meta property="og:image" content="https://saptet.tungdadev.com/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="vi_VN">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -75,6 +82,23 @@
   </main>
 
   <footer class="foot">Giờ Việt Nam (GMT+7) · làm bởi <a href="https://www.tungdadev.com/">TungDaDev</a></footer>
+  <div class="sheet-scrim" id="sheet-scrim"></div>
+  <section class="sheet" id="share-sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" aria-hidden="true">
+    <div class="sheet-head">
+      <h2 id="sheet-title">Gửi cho bạn bè</h2>
+      <button class="sheet-x" id="sheet-close" aria-label="Đóng"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+    <p class="sheet-preview" id="share-preview"></p>
+    <div class="sheet-grid">
+      <button data-share="facebook"><i style="background:#1877F2"><svg class="brand" viewBox="0 0 24 24"><path d="M14 8h3V4h-3c-2.8 0-4.5 1.8-4.5 4.6V11H7v4h2.5v9h4v-9h3l.5-4h-3.5V8.9c0-.6.4-.9 1-.9z"/></svg></i>Facebook</button>
+      <button data-share="messenger"><i style="background:linear-gradient(45deg,#0099FF,#A033FF 60%,#FF5280)"><svg class="brand" viewBox="0 0 24 24"><path d="M12 2C6.4 2 2 6.1 2 11.6c0 2.9 1.2 5.4 3.2 7.1V22l2.9-1.6c1.2.3 2.5.5 3.9.5 5.6 0 10-4.1 10-9.4S17.6 2 12 2zm1 12.6l-2.5-2.7-5 2.7 5.5-5.8 2.6 2.7 4.9-2.7-5.5 5.8z"/></svg></i>Messenger</button>
+      <button data-share="zalo"><i style="background:#0068FF"><b class="zalo">Zalo</b></i>Zalo</button>
+      <button data-share="telegram"><i style="background:#26A5E4"><svg class="brand" viewBox="0 0 24 24"><path d="M21.6 4.2L2.9 11.4c-1.3.5-1.3 1.2-.2 1.6l4.8 1.5 1.8 5.6c.2.6.4.8.9.8.4 0 .6-.2.9-.4l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8l3.1-14.6c.3-1.3-.5-1.9-1.3-1.5zM9.3 14.4l9-5.7c.4-.3.8-.1.5.2l-7.7 7-.3 3.2-1.5-4.7z"/></svg></i>Telegram</button>
+      <button data-share="x"><i style="background:#000"><svg class="brand" viewBox="0 0 24 24"><path d="M17.8 3H21l-7 8 8.2 10h-6.4l-5-6.2L5.1 21H2l7.5-8.6L1.6 3h6.6l4.5 5.7L17.8 3zm-1.1 16.2h1.8L7.2 4.7H5.3l11.4 14.5z"/></svg></i>X</button>
+      <button data-share="copy"><i style="background:linear-gradient(180deg,#fff1c7,#f3c867)"><svg viewBox="0 0 24 24" style="color:#3a0a06"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></i>Chép link</button>
+      <button data-share="more"><i style="background:rgba(255,220,170,.14)"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg></i>Khác…</button>
+    </div>
+  </section>
   <div class="toast" id="toast" role="status"></div>
   <script src="app.js"></script>
 </body>
