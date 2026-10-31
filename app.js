@@ -66,10 +66,10 @@ function tick() {
   $('#title').textContent = T.celebrating ? (mode === 'tet' && !demo ? `Xuân ${T.canchi}` : T.name.replace('Năm mới', 'Happy New Year')) : T.name;
   $('#date').innerHTML = T.sub;
   if (T.celebrating) {
-    if (!celebrated) { celebrated = true; show(); for (let k = 0; k < 6; k++) setTimeout(burst, k * 350); }
-    if (Math.random() < .06) burst();
+    if (!celebrated) { celebrated = true; show(); fw.play(fw.programs.finale); setTimeout(() => fw.play(fw.programs.ambient, { loop: true }), 17000); }
     return;
   }
+  if (celebrated) fw.stop();
   celebrated = false;
   const left = Math.max(0, T.next - now);
   const d = Math.floor(left / DAY), h = Math.floor(left % DAY / 3600e3), m = Math.floor(left % 3600e3 / 6e4), s = Math.floor(left % 6e4 / 1e3);
@@ -78,7 +78,7 @@ function tick() {
   $('#bar').style.width = pct.toFixed(2) + '%';
   $('#progress-text').textContent = `Đã đi được ${pct.toFixed(1)}% chặng đường từ ${mode === 'tet' ? 'Tết năm ngoái' : 'đầu năm'}`;
   if (last !== m) { last = m; $('#sr').textContent = `Còn ${d} ngày ${h} giờ ${m} phút`; }
-  if (left < 11000 && left > 0) burst();                        // mười giây cuối: pháo hoa nổ dần
+  if (left < 11000 && left > 1000) fw.launch({ caliber: .75, rise: 1.4 });   // mười giây cuối: mỗi giây một quả nhỏ
 }
 
 // lời chúc xoay vòng
@@ -149,9 +149,9 @@ sheet.addEventListener('click', e => {
 
 // ---------- hoa mai rơi ----------
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const pc = $('#petals'), px = pc.getContext('2d'), fc = $('#fireworks'), fx = fc.getContext('2d');
+const pc = $('#petals'), px = pc.getContext('2d'), fc = $('#fireworks');
 let W, H, DPR = Math.min(2, devicePixelRatio || 1);
-function size() { W = innerWidth; H = innerHeight; for (const c of [pc, fc]) { c.width = W * DPR; c.height = H * DPR; c.getContext('2d').setTransform(DPR, 0, 0, DPR, 0, 0); } }
+function size() { W = innerWidth; H = innerHeight; for (const c of [pc]) { c.width = W * DPR; c.height = H * DPR; c.getContext('2d').setTransform(DPR, 0, 0, DPR, 0, 0); } }
 size(); addEventListener('resize', size);
 const petals = Array.from({ length: W < 600 ? 14 : 28 }, () => newPetal(true));
 function newPetal(any) {
@@ -180,35 +180,9 @@ function petalsLoop() {
 }
 if (!reduce) petalsLoop(); else petals.slice(0, 10).forEach(drawPetal);
 
-// ---------- pháo hoa ----------
-const sparks = [], rockets = [];
-const COLORS = ['#ffd36b', '#ff6a4d', '#ffffff', '#ff9ec7', '#ffb43d', '#ff3b3b'];
-function burst(x, y) {
-  rockets.push({ x: x ?? W * (.2 + Math.random() * .6), y: H, ty: y ?? H * (.15 + Math.random() * .3), c: COLORS[Math.random() * COLORS.length | 0] });
-  if (!fireLoop.on) { fireLoop.on = true; fireLoop(); }
-}
-function fireLoop() {
-  fx.globalCompositeOperation = 'destination-out'; fx.fillStyle = 'rgba(0,0,0,.22)'; fx.fillRect(0, 0, W, H);
-  fx.globalCompositeOperation = 'lighter';
-  for (let i = rockets.length - 1; i >= 0; i--) {
-    const r = rockets[i]; r.y -= 9; fx.fillStyle = '#fff4d6'; fx.fillRect(r.x - 1, r.y, 2, 8);
-    if (r.y <= r.ty) {
-      rockets.splice(i, 1);
-      const n = 70 + Math.random() * 50 | 0;
-      for (let k = 0; k < n; k++) { const a = Math.random() * 6.28, v = 1.5 + Math.random() * 4.5;
-        sparks.push({ x: r.x, y: r.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, c: Math.random() < .25 ? '#ffffff' : r.c }); }
-    }
-  }
-  for (let i = sparks.length - 1; i >= 0; i--) {
-    const s = sparks[i]; s.vx *= .985; s.vy = s.vy * .985 + .045; s.x += s.vx; s.y += s.vy; s.life -= .012;
-    if (s.life <= 0) { sparks.splice(i, 1); continue; }
-    fx.globalAlpha = Math.max(0, s.life); fx.fillStyle = s.c; fx.beginPath(); fx.arc(s.x, s.y, 1.8, 0, 7); fx.fill();
-  }
-  fx.globalAlpha = 1;
-  if (sparks.length || rockets.length) requestAnimationFrame(fireLoop);
-  else { fx.clearRect(0, 0, W, H); fireLoop.on = false; }
-}
-$('#fire-btn').onclick = () => { for (let k = 0; k < 4; k++) setTimeout(burst, k * 220); };
-addEventListener('pointerdown', e => { if (!e.target.closest('button, a')) burst(e.clientX, e.clientY); });
+// ---------- pháo hoa (engine trong fireworks.js: vật lý theo giây, biên đạo như màn trình diễn thật) ----------
+const fw = createFireworks(fc, { reduceMotion: reduce });
+$('#fire-btn').onclick = () => fw.play(fw.programs.salvo);
+addEventListener('pointerdown', e => { if (!e.target.closest('button, a')) fw.launch({ x: e.clientX, y: Math.min(e.clientY, H * .5) }); });
 
 setMode(mode); show(); tick(); setInterval(tick, 1000);
